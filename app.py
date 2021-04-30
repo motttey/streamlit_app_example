@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 from sklearn import datasets
 
 st.title('Dashboard')
@@ -24,4 +25,20 @@ fig, ax = plt.subplots()
 sns.boxplot(x='sepal width (cm)', y='target', data=df, whis=[0,100], width=.5, palette="vlag", ax=ax)
 st.pyplot(fig)
 
-st.table(df)
+# st.table(df)
+
+# vega-lite
+df = pd.DataFrame(
+    np.random.randn(200, 3),
+    columns=['a', 'b', 'c']
+)
+
+st.vega_lite_chart(df, {
+    'mark': {'type': 'circle', 'tooltip': True},
+    'encoding': {
+        'x': {'field': 'a', 'type': 'quantitative'},
+        'y': {'field': 'b', 'type': 'quantitative'},
+        'size': {'field': 'c', 'type': 'quantitative'},
+        'color': {'field': 'c', 'type': 'quantitative'},
+    },
+})
