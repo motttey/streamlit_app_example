@@ -14,3 +14,8 @@ st.pyplot(fig)
 
 sns.countplot(x='現在最も該当すると考えるポジションを選択してください', data=df, ax=ax)
 st.pyplot(fig)
+
+unique_answer = df['データ可視化に取り組む際、他業種との連携で良かったと思うことや、苦労したことがあれば教えてください。'].dropna().unique()
+print(unique_answer)
+
+st.table(unique_answer)
