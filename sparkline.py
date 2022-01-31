@@ -48,10 +48,21 @@ Data source: [owid/covid-19-data]({})
 df = pd.read_csv(url, sep=",")
 df = df[df['indicator'] == 'Daily hospital occupancy']
 
-sort = st.radio("Sort keys", (True, False))
+sort = st.radio("Sort ASC/DESC", (True, False))
+key = st.selectbox(
+     'Sort Keys',
+     ('value_max', 'value_min', 'value_sum')
+)
 
 df_grouped = df.groupby(['entity', 'indicator'])['value'].apply(list).reset_index()
+
+df_grouped['value_max'] = [max(x) for x in df_grouped['value']]
+df_grouped['value_min'] = [min(x) for x in df_grouped['value']]
+df_grouped['value_sum'] = [sum(x) for x in df_grouped['value']]
+
+# st.dataframe(df_grouped)
+
 df_grouped['sparklines'] = df_grouped['value'].map(sparkline)
-df_grouped.sort_values('entity', ascending=sort, inplace=True)
+df_grouped.sort_values(key, ascending=sort, inplace=True)
 
 st.write(df_grouped[['entity', 'sparklines']].to_html(escape=False), unsafe_allow_html=True)
