@@ -39,12 +39,19 @@ def sparkline(data, figsize=(4, 0.5), **kwags):
     plt.close()
     return '<img src="data:image/png;base64,{}"/>'.format(base64.b64encode(img.read()).decode())
 
-st.title('Dashboard')
+st.title('Covid 19 Dashboard')
+
+st.markdown('''
+Data source: [owid/covid-19-data]({})
+'''.format(url))
 
 df = pd.read_csv(url, sep=",")
 df = df[df['indicator'] == 'Daily hospital occupancy']
 
+sort = st.radio("Sort keys", (True, False))
+
 df_grouped = df.groupby(['entity', 'indicator'])['value'].apply(list).reset_index()
 df_grouped['sparklines'] = df_grouped['value'].map(sparkline)
+df_grouped.sort_values('entity', ascending=sort, inplace=True)
 
 st.write(df_grouped[['entity', 'sparklines']].to_html(escape=False), unsafe_allow_html=True)
