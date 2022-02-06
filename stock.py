@@ -24,11 +24,11 @@ def lineplot(df):
     st.pyplot(fig)
 
 # https://seaborn.pydata.org/examples/timeseries_facets.html
-def smallMultiples(df):
+def smallMultiples(df, x, y):
     g = sns.relplot(
         data=df,
-        x="Date", y="Close", col="ticker", hue="ticker",
-        kind="line", palette="crest", linewidth=2.5, zorder=5,
+        x=x, y=y, col="ticker", hue="ticker",
+        kind="line", palette="crest", linewidth=1.5, zorder=5,
         col_wrap=2, height=2, aspect=1.5, legend=False,
     )
 
@@ -40,14 +40,21 @@ def smallMultiples(df):
 
         # Plot every year's time series in the background
         sns.lineplot(
-            data=df, x="Date", y="Close", units="ticker",
-            estimator=None, color=".7", linewidth=1, ax=ax,
+            data=df, x=x, y=y, units="ticker",
+            estimator=None, color=".7", linewidth=0.5, ax=ax,
         )
 
     # Reduce the frequency of the x axis ticks
     ax.set_xticks(ax.get_xticks()[::4])
 
     st.pyplot(g)
+
+def normalize_data(df):
+    min = df.min()
+    max = df.max()
+    x = df
+    y = (x - min) / (max - min)
+    return y
 
 sp500_list = load_data()
 
@@ -62,4 +69,11 @@ stacked_df = stacked_df.rename(columns={
 
 lineplot(stacked_df)
 
-smallMultiples(stacked_df)
+smallMultiples(stacked_df, "Date", "Close")
+
+st.text('Normalize Data')
+
+stacked_df["Close Norm"] = normalize_data(stacked_df["Close"])
+stacked_df["Close Norm"] = stacked_df.groupby("ticker")["Close"].transform(normalize_data)
+st.dataframe(stacked_df.head())
+smallMultiples(stacked_df, "Date", "Close Norm")
